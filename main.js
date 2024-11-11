@@ -1,5 +1,6 @@
 'use strict';
 
+
 const gameBoard = (function() {
     
     const board = [
@@ -35,8 +36,16 @@ const gameBoard = (function() {
         return true;
     };
 
+    const getCell = function (cellNumber) {
+        let row = Math.floor(cellNumber / 3);
+        let col = cellNumber % 3;
+        return board[row][col];
+    }
+
     const checkWinner = () => {
-        let symbol = null;
+        let won = 0;
+        let tie = true;
+
         let rows = [
             board[0],
             board[1],
@@ -53,29 +62,31 @@ const gameBoard = (function() {
         ]
 
         if (checkList(rows)) {
-            symbol = rows[0][0];
+            won = 1;
         }
         if (checkList(cols)) {
-            symbol = cols[0][0];
+            won = 1;
         }
         if (checkList(diags)) {
-            symbol = diags[0][0];
+            won = 1;
         }
 
-        let tie = true;
-        for(let row = 0; row < board.length; row++) {
-            for (let col = 0; col < board[row].length; col++) {
-                if (board[row][col] === "")
-                {
-                    tie = false;
+        if (!won) {
+            for(let row = 0; row < board.length; row++) {
+                for (let col = 0; col < board[row].length; col++) {
+                    if (board[row][col] === "")
+                    {
+                        tie = false;
+                    }
                 }
             }
         }
-        if (tie) {
-            return "tied"
-        }
 
-        return symbol;
+        if (tie) {
+            return 2
+        } 
+
+        return won;
     }
 
     const checkList = (list) => {
@@ -98,7 +109,7 @@ const gameBoard = (function() {
         }
     }
 
-    return { print, setCell, clear, checkWinner }
+    return { print, getCell, setCell, clear, checkWinner }
 
 })();
 
@@ -113,8 +124,8 @@ const players = (function() {
         symbol: "O",
     }
 
-    const getSymbol = function(player = 1) {
-        return player === 1 ? X.symbol : O.symbol;
+    const getSymbol = function(player) {
+        return player ? O.symbol : X.symbol;
     }
 
     const setName = function(name, player = 1) {
@@ -138,9 +149,12 @@ const gameState = (function (){
     let gameOver = false;
     let currentPlayer = 0;
     let winner = null;
+    let tied = false;
 
-    const playTurn = (symbol, cell) => {
-        if (gameBoard.setCell(symbol, cell) === true)
+    const playTurn = (cell) => {
+        let symbol = players.getSymbol(currentPlayer);
+
+        if (gameBoard.setCell(symbol, cell))
         {
             currentPlayer = !currentPlayer;
             return true;
@@ -148,26 +162,36 @@ const gameState = (function (){
         return false;
     }
 
+    // Function to play a game in the console
     const playGame = () => {
         gameBoard.print();
         while(!gameOver) {
             let symbol = currentPlayer ? players.getSymbol(2) : players.getSymbol(1);
-            printTurn();
+            printTurn(symbol);
+            
             let index = prompt("Choose square 0-8");
+
             if (playTurn(symbol, index))
             {
                 gameBoard.print();
-                let winnerSymbol = gameBoard.checkWinner();
-                if (winnerSymbol)
-                {
-                    winner = winnerSymbol;
+                let won = gameBoard.checkWinner();
+                
+                if (won === 2) {
+                    tied = true;
                     gameOver = true;
+                    continue;
+                }
+
+                if (won) {
+                    winner = symbol;
+                    gameOver = true;
+                    continue;
                 }
             } else {
                 alert("Space occupied, please select another");
             }
         }
-        if (winner === "tied") {
+        if (tied) {
             alert("players tied")
         } else {
             alert(`${winner} Won!`)
@@ -179,11 +203,12 @@ const gameState = (function (){
         gameOver = false;
         winner = null;
         currentPlayer = 0;
+        tied = false;
         return true;
     }
 
-    const printTurn = () => {
-        console.log(`${currentPlayer ? players.getSymbol(2) : players.getSymbol(1)} to move`);
+    const printTurn = (symbol) => {
+        console.log(`${ symbol } to move`);
     }
 
     return { playTurn, resetGame, playGame }
@@ -193,6 +218,30 @@ const gameState = (function (){
 const boardDisplay = (function () {
     const boardContainer = document.querySelector(".board");
 
-    
+    const initDisplay = function() {
+        for (let i = 0; i < 9; i++) {
+            let square = document.createElement("div");
+            square.classList.add("square");
+            square.setAttribute("data-id", i);
+            boardContainer.appendChild(square);
+            
+            square.addEventListener("click", (e) => {
+                let target = e.target;
+                let data = target.dataset.id;
+                gameState.playTurn(data);
+                console.log(data);
+                target.innerText = gameBoard.getCell(data);
+            });
+        }
+    }
 
+    const updateDisplay = function() {
+        let squares = document.querySelectorAll(".square");
+        for (let i = 0; i < squares.length; i++) {
+
+        }
+
+    };
+
+    initDisplay();
 })();
