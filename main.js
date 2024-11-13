@@ -80,11 +80,10 @@ const gameBoard = (function() {
                     }
                 }
             }
+            if (tie) {
+                return 2;
+            }
         }
-
-        if (tie) {
-            return 2
-        } 
 
         return won;
     }
@@ -225,23 +224,19 @@ const boardDisplay = (function () {
             square.setAttribute("data-id", i);
             boardContainer.appendChild(square);
             
-            square.addEventListener("click", (e) => {
-                let target = e.target;
-                let data = target.dataset.id;
-                gameState.playTurn(data);
-                console.log(data);
-                target.innerText = gameBoard.getCell(data);
-            });
+            square.addEventListener("click", updateCell);
         }
     }
 
-    const updateDisplay = function() {
-        let squares = document.querySelectorAll(".square");
-        for (let i = 0; i < squares.length; i++) {
+    const updateCell = function (e) {
+        let target = e.target;
+        let data = target.dataset.id;
+        gameState.playTurn(data);
 
-        }
-
-    };
+        let cell = document.createElement("div");
+        cell.innerText = gameBoard.getCell(data);
+        target.appendChild(cell)
+    }
 
     initDisplay();
 })();
