@@ -210,32 +210,46 @@ const gameState = (function (){
         console.log(`${ symbol } to move`);
     }
 
-    return { playTurn, resetGame, playGame }
+    const getCurrentPlayer = function() {
+        return currentPlayer;
+    }
+    return { playTurn, resetGame, playGame, getCurrentPlayer }
 
 })();
 
 const boardDisplay = (function () {
-    const boardContainer = document.querySelector(".board");
+    const gameDisplay = document.querySelector(".game-display");
+    const currentPlayer = document.querySelector(".current-player");
 
     const initDisplay = function() {
         for (let i = 0; i < 9; i++) {
             let square = document.createElement("div");
             square.classList.add("square");
             square.setAttribute("data-id", i);
-            boardContainer.appendChild(square);
+            gameDisplay.appendChild(square);
             
-            square.addEventListener("click", updateCell);
+            square.addEventListener("click", (updateCell));
         }
+
+        updateDisplay();
     }
 
-    const updateCell = function (e) {
+    const updateCell = function(e) {
         let target = e.target;
-        let data = target.dataset.id;
-        gameState.playTurn(data);
+        if (gameState.playTurn(target.dataset.id))
+        {
+            let icon = gameBoard.getCell(target.dataset.id) === "O" ?
+                        `<svg class="symbol" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 20a8 8 0 0 1-8-8a8 8 0 0 1 8-8a8 8 0 0 1 8 8a8 8 0 0 1-8 8m0-18A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg>`:
+                        `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="symbol"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"/></svg`;
+            target.innerHTML = icon;
+            gameBoard.print();
+        }
 
-        let cell = document.createElement("div");
-        cell.innerText = gameBoard.getCell(data);
-        target.appendChild(cell)
+        updateDisplay();
+    }
+
+    const updateDisplay = function() {
+        currentPlayer.innerText = gameState.getCurrentPlayer() ? "O to play" : "X to play";
     }
 
     initDisplay();

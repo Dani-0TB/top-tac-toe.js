@@ -1,0 +1,33 @@
+@use 'theme.scss';
+
+$board-width: 500px;
+$board-height: 500px;
+
+
+.game-display {
+    margin: 20px;
+    width: $board-width;
+    height: $board-height;
+    border: 4px solid;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+}
+
+.square {
+    border: 5px solid;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.symbol {
+    width: 100%;
+    height: 100%;
+}
+
+.current-player {
+    font-size: 20pt;
+    font-weight: 600;
+}

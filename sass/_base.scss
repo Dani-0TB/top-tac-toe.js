@@ -1,0 +1,53 @@
+@use "reset";
+@use "theme";
+
+:root {
+    font-family: sans-serif;
+
+    background-color: theme.$bg-light;
+    color: theme.$text-primary;
+    border-color: theme.$black;
+
+    transition: background-color 0.5s ease-in-out, 
+                color 0.5s ease-in-out, 
+                border-color 0.5s ease-in-out;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        background-color: theme.$bg-dark;
+        color: theme.$text-primary-dark;
+        border-color: theme.$white;
+    }
+}
+
+html {
+    box-sizing: border-box;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+.app {
+    width: 100vw;
+    height: 100vh;
+
+    padding: 40px;
+
+    display: flex;
+    flex-flow: column wrap;
+
+    align-items: center;
+    justify-content: start;
+}
+
+.title {
+    margin-bottom: 10px;
+    font-size: 24pt;
+    font-weight: 600;
+}
+
+hr {
+    width: 100%;
+}
